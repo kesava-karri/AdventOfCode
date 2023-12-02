@@ -1,43 +1,44 @@
 package src;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Day1 {
+    private static final Map<String, String> map = Map.of("one", "1",
+            "two", "2",
+            "three", "3",
+            "four", "4",
+            "five", "5",
+            "six", "6",
+            "seven", "7",
+            "eight", "8",
+            "nine", "9"
+    );
+
     public static int sumOfCalibrationValues(List<String> input) {
-        List<Integer> values = new ArrayList<>();
         int sum = 0;
+        Pattern pattern = Pattern.compile("one|two|three|four|five|six|seven|eight|nine|\\d");
 
         for (String str : input) {
-            int start = -1, end = -1;
-            for (int i = 0; i < str.length(); i++) {
-                char ch = str.charAt(i);
-                if (checkIfNum(ch)) {
-                    if (start == -1) {
-                        start = Character.getNumericValue(ch);
-                    } else {
-                        end = ch - '0';
-                    }
+            Matcher matcher = pattern.matcher(str);
+            String start = null, end = null;
+
+            while(matcher.find()) {
+                if (start == null) {
+                    start = matcher.group();
+                } else {
+                    end = matcher.group();
+                    matcher.region(matcher.start() + 1, str.length());
                 }
             }
-            if (end == - 1) { // implies only one number in the string
+
+            if (end == null) { // implies only one number in the string
                 end = start;
             }
-            values.add(10 * start + end);
+            sum += Integer.parseInt(map.getOrDefault(start, start) + map.getOrDefault(end, end));
         }
-        for (Integer value : values) {
-            sum += value;
-        }
-        System.out.println(sum);
         return sum;
-    }
-
-    private static boolean checkIfNum(char ch) {
-        for (int i = 0; i <= 9; i++) {
-            if (i == Character.getNumericValue(ch)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
